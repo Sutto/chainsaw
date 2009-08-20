@@ -17,6 +17,7 @@ class Main
     queues.each { |q| hash[q.name] = q.recent }
     json = JSON.dump(hash.to_json)
     json = "#{params[:callback]}(#{json});" if params[:callback]
+    content_type :json
     return json
   end
   
