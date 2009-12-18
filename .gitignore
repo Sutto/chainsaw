@@ -1,0 +1,5 @@
+config/friendly.yml
+db/*.sqlite3
+tmp/*
+log/*
+vendor/gems
