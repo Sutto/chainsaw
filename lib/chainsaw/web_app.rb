@@ -33,23 +33,27 @@ module Chainsaw
     
     # Stream configuration page
     get '/s/:identifier' do
+      auto_wrap JSON.dump({
+        'recent_url'  => live_url("/s/#{params[:identifier]}/recent"),
+        'publish_url' => live_url("/s/#{params[:identifier]}/publish"),
+        'event_count' => Chainsaw::Event.count(:stream_identifier => params[:identifier])
+      })
     end
     
     # Gets a list of recent entries
     get '/s/:identifier/recent' do
-      events = Chainsaw::Event.recent_for(params[:identifier], constrained_limit(params[:limit]))
+      events = Chainsaw::Event.recent_for(params[:identifier], constrained_limit(1, 1000, 25, params[:limit]))
       auto_wrap jsonify(events)
     end
     
     # Publish an item to a stream
-    get '/s/:identifier/publish' do
+    post '/s/:identifier/publish' do
       stream = Chainsaw::Stream.first(:identifier => params[:identifier])
       if stream.api_key == params[:api_key]
-        event = stream.build_event(:message => request.body)
+        event = stream.build_event(:message => get_request_body)
         if event.save
           status 200
-          auto_wrap "{'identifier':#{JSON.dump(stream.identifier)}}"
-          auto_wrap JSON.dump({'identifier' => stream.identifier})
+          auto_wrap JSON.dump('identifier' => stream.identifier)
         else
           status 422
           auto_wrap INVALID_MESSAGE_JSON
@@ -62,7 +66,8 @@ module Chainsaw
     
     helpers do
     
-      def constrained_limit(min, max, current)
+      def constrained_limit(min, max, default, current)
+        current = default if current.blank? || current.to_i == 0
         [max, [current.to_i, min].max].min
       end
     
@@ -90,6 +95,12 @@ module Chainsaw
         File.join(url, path)
       end
     
+      def get_request_body
+        body = request.body
+        body.rewind if body.respond_to?(:rewind)
+        body.read
+      end
+      
     end
     
   end

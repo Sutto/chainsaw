@@ -28,11 +28,11 @@ module Chainsaw
     end
     
     def identifier
-      @identifier ||= generate_identifier
+      @identifier ||= recursive_generate(:identifier) { generate_identifier }
     end
     
     def api_key
-      @api_key ||= generate_api_key
+      @api_key ||= recursive_generate(:api_key) { generate_api_key }
     end
     
     def valid?
@@ -51,6 +51,15 @@ module Chainsaw
     
     def generate_api_key
       Digest::SHA256.hexdigest(Friendly::UUID.new.to_s)
+    end
+    
+    def recursive_generate(field, &generator)
+      # Note: this is only called as a new record.
+      # it will be invalid otherwise.
+      value = nil
+      while value.blank? || (self.class.count(field => value) > 0)
+        value = generator.call
+      end
     end
     
   end
