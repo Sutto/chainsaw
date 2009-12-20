@@ -60,6 +60,7 @@ module Chainsaw
       while value.blank? || (self.class.count(field => value) > 0)
         value = generator.call
       end
+      value
     end
     
   end
