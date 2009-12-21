@@ -36,12 +36,17 @@ module Chainsaw
       @logger = logger
     end
     
+    def broadcaster
+      @broadcaster ||= Chainsaw::StreamBroadcaster.new
+    end
+    
     def boot!
       require_env
       configure_logger
       configure_friendly
       require_models
-      require_webapp
+      require 'chainsaw/web_app'
+      require 'chainsaw/stream_publisher'
       true
     end
     
@@ -63,10 +68,6 @@ module Chainsaw
     def require_models
       require 'chainsaw/stream'
       require 'chainsaw/event'
-    end
-    
-    def require_webapp
-      require 'chainsaw/web_app'
     end
   
   end

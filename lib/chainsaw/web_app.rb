@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'closure-compiler'
 
 module Chainsaw
   class WebApp < Sinatra::Base
@@ -19,7 +20,10 @@ module Chainsaw
     
     set(:environment, Proc.new { Chainsaw.env.to_sym })
     set(:root,        Proc.new { Chainsaw.root.to_s })
+    set(:public,      Proc.new { Chainsaw.root.join("public").to_s })
+    set(:views,       Proc.new { Chainsaw.root.join("views").to_s })
     set(:app_file,    __FILE__)
+    set(:static,      true)
     
     disable :run
     
@@ -29,6 +33,10 @@ module Chainsaw
         "version" => Chainsaw.version,
         "ruby"    => RUBY_VERSION
       }).freeze
+    end
+    
+    get '/j/configuration.js' do
+      erb :configuration
     end
     
     # Stream configuration page
@@ -99,6 +107,31 @@ module Chainsaw
         body = request.body
         body.rewind if body.respond_to?(:rewind)
         body.read
+      end
+      
+      def compiler
+        @compiler ||= Closure::Compiler.new
+      end
+      
+      def compress_js(javascript)
+        compiler.compile(javascript)
+      end
+      
+      def raw_spinderella_js
+        @raw_spinderella_js ||= begin
+          buffer = ""
+          buffer << File.read(Chainsaw.root.join("public", "javascripts", "spinderella.js"))
+          buffer << erb(:configuration)
+          buffer
+        end
+      end
+      
+      def raw_chainsaw_js
+        @raw_chainsaw_js ||= begin
+          buffer = ""
+          
+          buffer
+        end
       end
       
     end
