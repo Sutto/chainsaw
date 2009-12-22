@@ -10,7 +10,8 @@ task :minify do
              'orbited.js'       => 'orbited.min.js',
              'json2.js'         => 'json2.min.js',
              'spinderella.js'   => 'spinderella.min.js',
-             'chainsaw/base.js' => 'chainsaw/base.min.js'
+             'chainsaw/base.js' => 'chainsaw/base.min.js',
+             'chainsaw/util.js' => 'chainsaw/util.min.js'
 end
 
 def compile_js(opts = {})

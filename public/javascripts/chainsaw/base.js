@@ -1,5 +1,6 @@
 var Chainsaw = {
   
+  Util:             {},
   spinderella:      null,
   processors:       {},
   loadExisting:     false,
@@ -133,7 +134,11 @@ var Chainsaw = {
   
   receiveFromStream: function(message, stream) {
     var processor = this.processors[stream];
-    if(processor) processor(message, stream);
+    // Execute blocks in the scope of Chainsaw.Util to make it easier
+    // to use helpers.
+    if(processor) {
+      with(this.Util) {  processor(message, stream); }
+    }
   }
   
 };
