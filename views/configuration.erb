@@ -1,4 +1,7 @@
 // Configure the Spinderella code.
-Spinderella.Orbited.javascriptURL  = <%= live_url("/javascripts/orbited.min.js").to_json %>;
 Spinderella.jsSocket.javascriptURL = <%= live_url("/javascripts/jssocket.min.js").to_json %>;
 Spinderella.jsSocket.flashURL      = <%= live_url("/flash/jsSocket.swf").to_json %>;
+Spinderella.Orbited.javascriptURL  = <%= live_url("/javascripts/orbited.min.js").to_json %>;
+// By default use chainsaw. as the domain prefix.
+Spinderella.Orbited.orbitedHost    = "chainsaw." + document.domain;
+Spinderella.Orbited.orbitedPort    = 80;

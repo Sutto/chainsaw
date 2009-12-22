@@ -85,10 +85,11 @@ var Chainsaw = {
   
   ready: function() {
     var l = this.onReadyCallbacks.length;
-    for(var i = 0; i < l; i++)
+    for(var i = 0; i < l; i++) {
       this.onReadyCallbacks[i]();
+    }
     this.onReadyCallbacks = [];
-  };
+  },
   
   alias: function(from, to) {
     this.onMessage(to, function(m, log) {
@@ -105,7 +106,7 @@ var Chainsaw = {
     this.spinderella.onMessage(function() {
       self.receiveMessage.apply(self, arguments);
     });
-  }
+  },
   
   connect: function(f) {
     if(this.connected) return;
@@ -116,17 +117,17 @@ var Chainsaw = {
       Chainsaw.connected = true;
       Chainsaw.ready();
     });
-  }
+  },
   
   receiveMessage: function(content, type, data) {    
+    // Anything not to a specific channel is counted as an eval.
     switch(type) {
-      // Anything not to a specific channel is counted as an eval.
-      case "all", "users", "channels":
-        eval(content);
-        break;
-      case "channel":
-        this.receiveFromStream(JSON.parse(content), data["channel"].replace(, /^chainsaw\//, ''))
-        break;
+    case "channel":
+      this.receiveFromStream(JSON.parse(content), data["channel"].replace(/^chainsaw\//, ''))
+      break;
+    default:
+      eval(content);
+      break;
     }
   },
   

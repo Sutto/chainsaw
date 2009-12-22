@@ -4,9 +4,11 @@ module Chainsaw
   class Stream
     include Friendly::Document
     
-    attribute :api_key,    String
-    attribute :identifier, String
-    attribute :name,       String
+    attribute :api_key,       String
+    attribute :identifier,    String
+    attribute :short_name,    String
+    attribute :name,          String
+    attribute :domain_prefix, String
     
     indexes :api_key
     indexes :identifier
@@ -35,8 +37,12 @@ module Chainsaw
       @api_key ||= recursive_generate(:api_key) { generate_api_key }
     end
     
+    def valid_domain_prefix?
+      domain_prefix.blank? || domain_prefix =~ /\w+/
+    end
+    
     def valid?
-      name.present?
+      name.present? && valid_domain_prefix?
     end
     
     def save

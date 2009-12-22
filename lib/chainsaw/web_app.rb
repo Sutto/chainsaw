@@ -35,7 +35,13 @@ module Chainsaw
       }).freeze
     end
     
+    get '/j/chainsaw.js' do
+      content_type :js
+      compressed_configuration_js
+    end
+    
     get '/j/configuration.js' do
+      content_type :js
       erb :configuration
     end
     
@@ -46,6 +52,12 @@ module Chainsaw
         'publish_url' => live_url("/s/#{params[:identifier]}/publish"),
         'event_count' => Chainsaw::Event.count(:stream_identifier => params[:identifier])
       })
+    end
+    
+    get '/s/:identifier/.js' do
+      content_type :js
+      @stream = Chainsaw::Stream.first(:identifier => params[:identifier])
+      "#{compressed_configuration_js}\r\n#{erb(:stream_configuration)}".gsub(/\n\s+\n/, "\n")
     end
     
     # Gets a list of recent entries
@@ -110,7 +122,7 @@ module Chainsaw
       end
       
       def compiler
-        @compiler ||= Closure::Compiler.new
+        @@compiler ||= Closure::Compiler.new
       end
       
       def compress_js(javascript)
@@ -118,8 +130,9 @@ module Chainsaw
       end
       
       def raw_spinderella_js
-        @raw_spinderella_js ||= begin
+        @@raw_spinderella_js ||= begin
           buffer = ""
+          buffer << File.read(Chainsaw.root.join("public", "javascripts", "json2.js"))
           buffer << File.read(Chainsaw.root.join("public", "javascripts", "spinderella.js"))
           buffer << erb(:configuration)
           buffer
@@ -127,11 +140,16 @@ module Chainsaw
       end
       
       def raw_chainsaw_js
-        @raw_chainsaw_js ||= begin
+        @@raw_chainsaw_js ||= begin
           buffer = ""
-          
+          buffer << File.read(Chainsaw.root.join("public", "javascripts", "chainsaw", "base.js"))
+          buffer << erb(:configuration)
           buffer
         end
+      end
+      
+      def compressed_configuration_js
+        @@compressed_configuration_js ||= compress_js([raw_spinderella_js, raw_chainsaw_js].join("\n\n"))
       end
       
     end

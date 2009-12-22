@@ -1,0 +1,11 @@
+<% if @stream.domain_prefix.present? %>
+Chainsaw.Orbited.orbitedHost = "<%= @stream.domain_prefix %>." + document.domain;
+<% end %>
+
+Chainsaw.run = function(f) {
+  Chainsaw.connect(function() {
+    if(typeof f == "function") f();
+    Chainsaw.watch(<%= @stream.identifier.to_json %>);
+    <% if @stream.short_name.present? %>Chainsaw.alias(<%= @stream.identifier.to_json %>, <%= @stream.short_name.to_s.to_json %>);<% end %> 
+  })
+};

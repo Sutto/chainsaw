@@ -6,8 +6,11 @@ end
 # Compresses the javascript associated with Chainsaw
 task :minify do
   require 'closure-compiler'
-  compile_js 'jssocket.js' => 'jssocket.min.js',
-             'orbited.js'  => 'orbited.min.js'
+  compile_js 'jssocket.js'      => 'jssocket.min.js',
+             'orbited.js'       => 'orbited.min.js',
+             'json2.js'         => 'json2.min.js',
+             'spinderella.js'   => 'spinderella.min.js',
+             'chainsaw/base.js' => 'chainsaw/base.min.js'
 end
 
 def compile_js(opts = {})
