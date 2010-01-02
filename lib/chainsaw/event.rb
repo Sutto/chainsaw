@@ -42,7 +42,7 @@ module Chainsaw
     end
     
     def broadcast!
-      # Chainsaw.broadcaster.publish(self)
+      # Chainsaw.publisher.publish(self)
     end
     
   end

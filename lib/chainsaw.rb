@@ -36,8 +36,8 @@ module Chainsaw
       @logger = logger
     end
     
-    def broadcaster
-      @broadcaster ||= Chainsaw::StreamBroadcaster.new
+    def publisher
+      @publisher ||= Chainsaw::StreamPublisher.new
     end
     
     def boot!
