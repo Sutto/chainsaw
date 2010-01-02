@@ -42,7 +42,9 @@ module Chainsaw
     end
     
     def broadcast!
-      # Chainsaw.publisher.publish(self)
+      Chainsaw.publisher.publish(self)
+    rescue Exception => e
+      Chainsaw.logger.warn "Error broadcasting event for #{self.stream_identifier}"
     end
     
   end

@@ -37,7 +37,10 @@ module Chainsaw
     end
     
     def publisher
-      @publisher ||= Chainsaw::StreamPublisher.new
+      @publisher ||= begin
+        config = YAML.load(File.read(root.join("config", "spinderella.yml")))[env]
+        Chainsaw::StreamPublisher.new(config)
+      end
     end
     
     def boot!
