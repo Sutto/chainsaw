@@ -1,7 +1,4 @@
 development:
-  adapter:  sqlite
-  database: db/development.sqlite3
-
-test:
-  adapter:  sqlite
-  database: db/test.sqlite3
+  host: localhost
+  port: 42341
+  password: icantbelieveitisbutter

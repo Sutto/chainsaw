@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+require File.join(File.dirname(__FILE__), "..", "lib", "chainsaw")
+require 'chainsaw/console'
+
+Chainsaw.env = ARGV.shift unless ARGV.empty?
+
+Chainsaw.boot!
+Chainsaw::Console.run

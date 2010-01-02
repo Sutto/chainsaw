@@ -1,5 +1,4 @@
 require 'fileutils'
-require 'closure-compiler'
 
 module Chainsaw
   class WebApp < Sinatra::Base

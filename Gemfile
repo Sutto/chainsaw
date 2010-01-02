@@ -12,5 +12,6 @@ gem 'perennial',     :require_as => 'perennial/protocols/pure_ruby/json_transpor
 gem 'friendly'
 gem 'rack'
 gem 'sinatra'
+gem 'closure-compiler'
 
 disable_system_gems
