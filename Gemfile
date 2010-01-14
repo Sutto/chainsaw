@@ -13,5 +13,6 @@ gem 'friendly'
 gem 'rack'
 gem 'sinatra'
 gem 'closure-compiler'
+gem 'validatable'
 
 disable_system_gems

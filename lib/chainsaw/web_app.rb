@@ -44,6 +44,27 @@ module Chainsaw
       erb :configuration
     end
     
+    # Create a stream page
+    post '/s' do
+      stream = Chainsaw::Stream.from_hash(params.dup)
+      if stream.save
+        auto_wrap(JSON.dump({
+          :result      => :success,
+          :stream      => stream.to_hash(true),
+          :config_url  => live_url("/s/#{stream.identifier}"),
+          :embed_url   => live_url("/s/#{stream.identifier}/.js"),
+          :recent_url  => live_url("/s/#{stream.identifier}/recent"),
+          :publish_url => live_url("/s/#{stream.identifier}/publish")
+        }))
+      else
+        status 422
+        auto_wrap(JSON.dump({
+          :result => :invalid,
+          :stream => stream.to_hash
+        }))
+      end
+    end
+    
     # Stream configuration page
     get '/s/:identifier' do
       auto_wrap JSON.dump({

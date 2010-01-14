@@ -3,6 +3,7 @@ require 'digest/sha2'
 module Chainsaw
   class Stream
     include Friendly::Document
+    include Validatable
     
     attribute :api_key,       String
     attribute :identifier,    String
@@ -15,6 +16,21 @@ module Chainsaw
     indexes :name
     
     #caches_by :id
+    
+    # Validations
+    validates_presence_of :name
+    validates_length_of   :name, :within => (5..255)
+    validates_length_of   :short_name, :within => (5..25), :if => lambda { short_name.present? }
+    validates_format_of   :domain_prefix, :with => /^\w+$/,
+      :message => 'is made up of invalid characters', :if => lambda { domain_prefix.present? }
+      
+    def self.from_hash(params_hash)
+      attrs = {}
+      [:name, :short_name, :domain_prefix].each do |key|
+        attrs[key] = params_hash[key] if params_hash[key].present?
+      end
+      self.new(attrs)
+    end
     
     def ==(other)
       self.class == other.class && self.identifier == other.identifier
@@ -37,16 +53,23 @@ module Chainsaw
       @api_key ||= recursive_generate(:api_key) { generate_api_key }
     end
     
-    def valid_domain_prefix?
-      domain_prefix.blank? || domain_prefix =~ /\w+/
-    end
-    
-    def valid?
-      name.present? && valid_domain_prefix?
-    end
-    
     def save
       valid? ? super : false
+    end
+    
+    def to_hash(full_details = false)
+      base = {
+        :short_name    => self.short_name,
+        :name          => self.name,
+        :domain_prefix => self.domain_prefix
+      }
+      if valid?
+        base.merge!(:identifier => self.identifier)
+        base.merge!(:api_key => self.api_key) if full_details
+      else
+        base.merge!(:errors => errors.errors)
+      end
+      base
     end
     
     protected
