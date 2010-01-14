@@ -36,7 +36,8 @@ module Chainsaw
       @logger = logger
     end
     
-    def publisher
+    def publisher(force = false)
+      @publisher = nil if !force
       @publisher ||= begin
         config = YAML.load(File.read(root.join("config", "spinderella.yml")))[env]
         Chainsaw::StreamPublisher.new(config)

@@ -1,4 +1,4 @@
 development:
   host: localhost
   port: 42341
-  password: icantbelieveitisbutter
+  token: icantbelieveitisbutter
