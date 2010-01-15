@@ -3,6 +3,9 @@ require 'digest/sha2'
 module Chainsaw
   class Stream
     include Friendly::Document
+    
+    self.table_name = "streams"
+    
     include Validatable
     
     attribute :api_key,       String

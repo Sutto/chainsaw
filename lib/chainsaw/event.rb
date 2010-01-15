@@ -2,6 +2,8 @@ module Chainsaw
   class Event
     include Friendly::Document
     
+    self.table_name = "events"
+    
     attribute :stream_identifier, String
     attribute :message,           String
     
