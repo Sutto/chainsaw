@@ -57,7 +57,7 @@ module Chainsaw
       valid? ? super : false
     end
     
-    def to_hash(full_details = false)
+    def as_hash(full_details = false)
       base = {
         :short_name    => self.short_name,
         :name          => self.name,

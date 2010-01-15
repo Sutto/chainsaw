@@ -7,6 +7,7 @@ gem 'json',          :require_as => 'json/pure'
 gem 'activesupport', :require_as => 'active_support'
 gem 'will_paginate', :require_as => 'will_paginate/collection'
 gem 'sqlite3-ruby',  :require_as => 'sqlite3'
+gem 'mysql'
 # Require just the pure ruby transport
 gem 'spinderella-client'
 gem 'friendly'

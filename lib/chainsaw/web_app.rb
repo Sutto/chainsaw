@@ -50,8 +50,8 @@ module Chainsaw
       if stream.save
         auto_wrap(JSON.dump({
           :result      => :success,
-          :stream      => stream.to_hash(true),
-          :config_url  => live_url("/s/#{stream.identifier}"),
+          :stream      => stream.as_hash(true),
+          :stats_url   => live_url("/s/#{stream.identifier}"),
           :embed_url   => live_url("/s/#{stream.identifier}/.js"),
           :recent_url  => live_url("/s/#{stream.identifier}/recent"),
           :publish_url => live_url("/s/#{stream.identifier}/publish")
@@ -60,7 +60,7 @@ module Chainsaw
         status 422
         auto_wrap(JSON.dump({
           :result => :invalid,
-          :stream => stream.to_hash
+          :stream => stream.as_hash
         }))
       end
     end
@@ -89,8 +89,8 @@ module Chainsaw
     # Publish an item to a stream
     post '/s/:identifier/publish' do
       stream = Chainsaw::Stream.first(:identifier => params[:identifier])
-      if stream.api_key == params[:api_key]
-        event = stream.build_event(:message => get_request_body)
+      if stream && stream.api_key == params[:api_key]
+        event = stream.build_event(:message => params[:message])
         if event.save
           status 200
           auto_wrap JSON.dump('identifier' => stream.identifier)
@@ -133,12 +133,6 @@ module Chainsaw
           url << ":#{request.port}"
         end
         File.join(url, path)
-      end
-    
-      def get_request_body
-        body = request.body
-        body.rewind if body.respond_to?(:rewind)
-        body.read
       end
       
       def compiler
