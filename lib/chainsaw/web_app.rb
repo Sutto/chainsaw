@@ -27,11 +27,11 @@ module Chainsaw
     disable :run
     
     get '/' do
-      @about ||= JSON.dump({
+      auto_wrap(@about ||= JSON.dump({
         "name"    => "Chainsaw",
         "version" => Chainsaw.version,
         "ruby"    => RUBY_VERSION
-      }).freeze
+      }).freeze)
     end
     
     get '/j/chainsaw.js' do
