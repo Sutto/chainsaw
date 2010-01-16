@@ -17,13 +17,17 @@ module Chainsaw
     indexes :api_key
     indexes :identifier
     indexes :name
+    indexes :created_at
     
     #caches_by :id
     
     # Validations
-    validates_presence_of :name
-    validates_length_of   :name, :within => (5..255)
-    validates_length_of   :short_name, :within => (5..25), :if => lambda { short_name.present? }
+    validates_presence_of :name,
+      :message => "is not present"
+    validates_length_of   :name, :within => (5..255),
+      :message => "must be 5 to 255 characters long"
+    validates_length_of   :short_name, :within => (3..25), :if => lambda { short_name.present? },
+      :message => "must be 3-25 characters long"
     validates_format_of   :domain_prefix, :with => /^\w+$/,
       :message => 'is made up of invalid characters', :if => lambda { domain_prefix.present? }
       
