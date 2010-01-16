@@ -1,0 +1,4 @@
+---
+app: /path/to/deploy
+user: some-user
+host: somedomain.com
