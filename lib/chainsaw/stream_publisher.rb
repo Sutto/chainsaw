@@ -1,3 +1,5 @@
+require 'active_support'
+
 module Chainsaw
   class StreamPublisher
     
@@ -7,7 +9,7 @@ module Chainsaw
     attr_reader :spinderella
     
     def initialize(options = {})
-      @options = options.symbolize_keys
+      @options = (options || {}).symbolize_keys
       @spinderella = Spinderella::Client::Broadcaster.new(@options)
     end
     
