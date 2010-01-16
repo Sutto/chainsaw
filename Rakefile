@@ -29,7 +29,7 @@ end
 namespace :deploy do
   
   def config(key)
-    (@config ||= YAML.load_file("config/deploy.yml").symbolize_keys)[key.to_sym]
+    (@config ||= YAML.load_file("config/deploy.yml"))[key.to_s]
   end
   
   # Hooks as needed
