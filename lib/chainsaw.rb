@@ -10,7 +10,7 @@ require 'active_support'
 module Chainsaw
   class << self
     
-    VERSION = [2, 0, 0, 0]
+    VERSION = [2, 0, 1, 0]
     
     def version(inc_patch = (VERSION.last != 0))
       VERSION[0, inc_patch ? 4 : 3].join(".")
