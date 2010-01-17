@@ -1,7 +1,13 @@
 // Configure the Spinderella code.
-Spinderella.jsSocket.javascriptURL = <%= live_url("/javascripts/jssocket.min.js").to_json %>;
-Spinderella.jsSocket.flashURL      = <%= live_url("/flash/jsSocket.swf").to_json %>;
-Spinderella.Orbited.javascriptURL  = <%= live_url("/javascripts/orbited.min.js").to_json %>;
+Spinderella.JSSocket.javascriptURL = <%= asset_url("/javascripts/jssocket.min.js").to_json %>;
+Spinderella.JSSocket.flashURL = <%= asset_url("/flash/jssocket.swf").to_json %>;
+Spinderella.Orbited.javascriptURL = <%= asset_url("/javascripts/orbited.min.js").to_json %>;
 // By default use chainsaw. as the domain prefix.
-Spinderella.Orbited.orbitedHost    = "chainsaw." + document.domain;
-Spinderella.Orbited.orbitedPort    = 80;
+Spinderella.Orbited.orbitedHost = "chainsaw." + document.domain;
+Spinderella.Orbited.orbitedPort = 80;
+// Chainsaw Host.
+Chainsaw.host = <%= request.host.to_json %>;
+Chainsaw.streamURL = <%= live_url('/s/IDENTIFIER/recent').to_json %>;
+<% if Chainsaw.env.development? %>
+Chainsaw.debug = true;
+<% end %>

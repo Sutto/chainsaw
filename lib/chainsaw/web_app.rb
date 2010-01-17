@@ -3,11 +3,65 @@ require 'fileutils'
 module Chainsaw
   class WebApp < Sinatra::Base
     
+    class Rescuer
+      
+      REQUEST_ERROR_JSON = JSON.dump({'error' => 'An unknown error occured processing your request.'}).freeze
+      
+      def initialize(app)
+        @app = app
+      end
+      
+      def call(env)
+        self.dup._call(env)
+      end
+      
+      def _call(env)
+        begin
+          @app.call(env)
+        rescue Exception => e
+          response_for_exception(e, env)
+        end
+      end
+      
+      protected
+      
+      def response_for_exception(e, env)
+        logger = Chainsaw.logger
+        logger.fatal "Exception on Request: #{e.class.name} - #{e.message}"
+        e.backtrace.each do |line|
+          logger.fatal "-> #{line}"
+        end
+        logger.fatal "Sending rescued response"
+        # Send a response
+        response = Rack::Response.new
+        request  = (env['rack.request'] ||= Rack::Request.new(env))
+        response.status = 500
+        if Chainsaw.env.development?
+          response['Content-Type'] = "text/html"
+          error_name = "#{e.class.name} - #{e.message}"
+          response.write "<html><head><title>#{error_name}</title></head>"
+          response.write"<body><h1>#{error_name}</h1><pre>"
+          e.backtrace.each do |line|
+            response.write "#{line}\r\n"
+          end
+          response.write "</pre></body></html>"
+        else
+          callback = request.params["callback"]
+          if callback
+            response["Content-Type"] = "application/javascript"
+            response.write("#{callback}(#{REQUEST_ERROR_JSON});");
+          else
+            response["Content-Type"] = "application/json"
+            response.write REQUEST_ERROR_JSON
+          end
+        end
+        response.finish
+      end
+      
+    end
+    
     INVALID_MESSAGE_JSON   = JSON.dump({'error' => 'Invalid message provided'}).freeze
     STREAM_PERMISSION_JSON = JSON.dump({'error' => 'You do not have permission to publish to this stream'}).freeze
-    
-    def self.serve!
-    end
     
     def self.redirect_stdio!
       log_dir = Chainsaw.root.join("log")
@@ -25,6 +79,8 @@ module Chainsaw
     set(:static,      true)
     
     disable :run
+    
+    use Rescuer
     
     get '/' do
       auto_wrap(@about ||= JSON.dump({
@@ -77,7 +133,16 @@ module Chainsaw
     get '/s/:identifier/.js' do
       content_type :js
       @stream = Chainsaw::Stream.first(:identifier => params[:identifier])
-      "#{compressed_configuration_js}\r\n#{erb(:stream_configuration)}".gsub(/\n\s+\n/, "\n")
+      message = [compressed_configuration_js, "\r\n"];
+      if @stream.blank?
+        run = 'Chainsaw.run = function() {'
+        run << (params[:verbose] ? "alert('Woops! it seams someone is trying to load an invalid Chainsaw stream.');" : '')
+        run << '};'
+        message << run;
+      else
+        message << erb(:stream_configuration);
+      end
+      message.join.gsub(/\n\s+\n/, "\n")
     end
     
     # Gets a list of recent entries
@@ -135,12 +200,19 @@ module Chainsaw
         File.join(url, path)
       end
       
+      def asset_url(path)
+        asset_path = Chainsaw.root.join("public", path.gsub(/^\//, ''))
+        mtime = (asset_path.exist? ? asset_path.mtime : Time.now).to_i
+        [live_url(path), mtime].join("?")
+      end
+      
       def compiler
         @@compiler ||= Closure::Compiler.new
       end
       
       def compress_js(javascript)
-        compiler.compile(javascript)
+        Chainsaw.env.development? ? javascript : compiler.compile(javascript)
+        javascript
       end
       
       def raw_spinderella_js
@@ -148,7 +220,6 @@ module Chainsaw
           buffer = ""
           buffer << File.read(Chainsaw.root.join("public", "javascripts", "json2.js"))
           buffer << File.read(Chainsaw.root.join("public", "javascripts", "spinderella.js"))
-          buffer << erb(:configuration)
           buffer
         end
       end
