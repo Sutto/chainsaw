@@ -128,6 +128,7 @@ var Chainsaw = {
   },
   
   receiveMessage: function(content, type, data) {    
+    Chainsaw.log(content, type, data);
     // Anything not to a specific channel is counted as an eval.
     switch(type) {
     case "channel":
@@ -143,9 +144,8 @@ var Chainsaw = {
     var processor = this.processors[stream];
     // Execute blocks in the scope of Chainsaw.Util to make it easier
     // to use helpers.
-    if(processor) {
+    if(processor)
       with(this.Util) {  processor(message, stream); }
-    }
   },
   
   log: function() {
